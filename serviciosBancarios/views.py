@@ -1,10 +1,12 @@
 from django.db.models import fields
 from django.http.response import HttpResponse, JsonResponse
-from serviciosBancarios.models import Banco, Cliente, Cuenta
+from serviciosBancarios.models import Banco, Cliente, Cuenta, Transferencia
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
+from django.forms.models import model_to_dict
 import json
+import datetime
 # Create your views here.
 
 @csrf_exempt
@@ -83,7 +85,35 @@ def obt_datos_trans_inter(request):
         
 
 def transferencia_interbancaria(request, n_cuenta_o, nom_banco_o, n_cuenta_d, nom_banco_d, mon):
-    print(n_cuenta_o, nom_banco_o, n_cuenta_d, nom_banco_d, mon)
-    return JsonResponse({"cuenta_o":n_cuenta_o, "nombanco_o": nom_banco_o, "cuenta_d": n_cuenta_d, "nombanco_d": nom_banco_d, "mont": mon})
+    #print(n_cuenta_o, nom_banco_o, n_cuenta_d, nom_banco_d, mon)
+    cli_o = Cliente.objects.get(id_cuenta=n_cuenta_o)
+    cli_d = Cliente.objects.get(id_cuenta=n_cuenta_d)
+    if mon <= cli_o.id_cuenta.monto:
+        restante = cli_o.id_cuenta.monto - mon
+        agregacion = cli_d.id_cuenta.monto + mon
+        fecha = datetime.datetime.today()
+        #print(restante)
+        id = cli_o.id_cuenta
+        trans = Transferencia(fecha_trans=fecha.today(), tipo_trans="Interbancaria", id_cuenta=id)
+        trans.save()
+        cue_o = Cuenta.objects.get(num_cuenta=cli_o.id_cuenta.num_cuenta)
+        cue_d = Cuenta.objects.get(num_cuenta=cli_d.id_cuenta.num_cuenta)
+        #print("CUENTAAAAAAAAA", type(cue_o.monto))
+        cue_o.monto = restante
+        cue_o.save()
+        cue_d.monto = agregacion
+        cue_d.save()
+        trans1 = Transferencia.objects.latest("id")
+        #cli_d.id_cuenta.monto = agregacion
+        #cli_d.id_cuenta.monto.save()
+        #print("si alcanza", type(json.dumps(trans1.id_cuenta)))
+        #data = serializers.serialize('json', trans1.id_cuenta)
+        return JsonResponse({"id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
+        #print("si alcanza", trans1.id)
+    else:
+        print("no alcanza")
+    print("CLIENTE ORIGEEN: {}".format(cli_o.nombres))
+    print("CLIENTE destino: {}".format(cli_d.nombres))
+    return JsonResponse({"mensaje": "TRANSFERENCIA INTERBANCARIA ERRONEA"})
     
 
