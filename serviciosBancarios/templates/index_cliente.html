@@ -7,8 +7,16 @@
     <title>Document</title>
 </head>
 <body>
-
-    <p>Cliente: {{cliente.nombres}}</p>
+    <li><a href="/sesion/">Interbancaria</a></li>
+    <li><a href="/login_page/">Salir</a></li>
+    <h1>Datos Cliente:</h1>
+        <p>Nombre: {{cliente.nombres}}</p>
+        <p>Cedula: {{cliente.cedula}}</p>
+        <p>Username: {{cliente.username}}</p>
+    <h2>Datos Cuenta:</h2>
+        <p>BANCO: {{banco.nombre}}</p>
+        <p>Numero de cuenta. {{cuenta.num_cuenta}}</p>
+        <p>Monto: {{cuenta.monto}}</p>
 
 </body>
 </html>

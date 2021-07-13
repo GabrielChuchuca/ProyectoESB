@@ -20,4 +20,8 @@ from serviciosBancarios import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login_page/', views.login_page),
+    path('sesion/', views.obt_sesion),
+    path('obtdatos/', views.obt_datos_trans_inter),
+    path('inter/<int:n_cuenta_o>/<str:nom_banco_o>/<int:n_cuenta_d>/<str:nom_banco_d>/<int:mon>/', views.transferencia_interbancaria),
+
 ]

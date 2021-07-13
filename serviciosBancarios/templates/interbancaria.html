@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Datos Cliente:</h1>
+        <p>Nombre: {{cliente.nombres}}</p>
+        <p>Cedula: {{cliente.cedula}}</p>
+        <p>Username: {{cliente.username}}</p>
+    <h2>Datos Cuenta:</h2>
+        <p>BANCO: {{banco.nombre}}</p>
+        <p>Numero de cuenta. {{cuenta.num_cuenta}}</p>
+        <p>Monto: {{cuenta.monto}}</p>
+
+    <h3><strong>TRANSFERENCIA INTERBANCARIA</strong></h3>
+    <form action="/obtdatos/" method="POST">{% csrf_token %}
+        <p>Numero de Cuenta Destino: <input type="number" name="numerocuenta"></p>
+        <p>Nombre de entidad: 
+            <select name="ban" id="ban">
+                <option value="">Seleccione...</option>
+                {% for banco in all_bancos %}
+                <option value="{{banco.nombre}}">{{banco.nombre}}</option>
+                {% endfor %}
+            </select>
+        </p>
+        <p>Monto: <input type="number" name="monto"></p>
+        <p><input type="submit" value="Realizar"></p>
+
+
+    </form>
+</body>
+</html>
