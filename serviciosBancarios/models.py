@@ -8,7 +8,6 @@ class Banco(models.Model):
 class Cuenta(models.Model):
     num_cuenta = models.IntegerField()
     monto = models.IntegerField()
-    password = models.CharField(max_length=8)
     id_Banco = models.ForeignKey(Banco, null=True, blank=True, on_delete=models.CASCADE)
     #codigobanco
 
@@ -21,8 +20,21 @@ class Transferencia(models.Model):
 class Cliente(models.Model):
     cedula = models.CharField(max_length=10)
     nombres = models.CharField(max_length=100)
+    username = models.CharField(max_length=30)
+    password = models.CharField(max_length=8)
     id_cuenta = models.ForeignKey(Cuenta, null=True, blank=True, on_delete=models.CASCADE)
+
+    #def __str__(self):
+    #    return self.nombres
     #codigocuenta
+
+    """def validar_login(self, username="", password=""):
+        result = Cliente.objects.filter(username__icontains=username, password__icontains=password)
+        if result:
+            print("QUI OE", result)
+            return result[0]
+        else:
+            return False"""
 
 
 
