@@ -19,5 +19,13 @@
         <p>Numero de cuenta. {{cuenta.num_cuenta}}</p>
         <p>Monto: {{cuenta.monto}}</p>
 
+    <h3><strong>TRANSFERENCIA BANCARIA</strong></h3>
+    <form action="/obtdatos_b/" method="POST">{% csrf_token %}
+        <p>Numero de Cuenta Destino: <input type="number" name="numerocuenta"></p>
+        <p>Monto: <input type="number" name="monto"></p>
+        <p><input type="submit" value="Realizar"></p>
+
+
+    </form>
 </body>
 </html>

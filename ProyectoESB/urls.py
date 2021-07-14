@@ -23,5 +23,10 @@ urlpatterns = [
     path('sesion/', views.obt_sesion),
     path('obtdatos/', views.obt_datos_trans_inter),
     path('inter/<int:n_cuenta_o>/<str:nom_banco_o>/<int:n_cuenta_d>/<str:nom_banco_d>/<int:mon>/', views.transferencia_interbancaria),
+    path('sesion_b/', views.obt_sesion_b),
+    path('obtdatos_b/', views.obt_datos_trans_banca),
+    path('banca/<int:n_cuenta_o>/<str:nom_banco_o>/<int:n_cuenta_d>/<int:mon>/', views.transferencia_bancaria),
+
+
 
 ]
