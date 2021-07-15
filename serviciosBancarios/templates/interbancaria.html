@@ -9,6 +9,7 @@
 <body>
     <li><a href="/sesion/">Interbancaria</a></li>
     <li><a href="/sesion_b/">Bancaria</a></li>
+    <li><a href="/sesion_d_r/">Deposito/Retiro</a></li>
     <li><a href="/login_page/">Salir</a></li>
     <h1>Datos Cliente:</h1>
         <p>Nombre: {{cliente.nombres}}</p>
@@ -21,8 +22,7 @@
 
     <h3><strong>TRANSFERENCIA INTERBANCARIA</strong></h3>
     <form action="/obtdatos/" method="POST">{% csrf_token %}
-        <p>Numero de Cuenta Destino: <input type="number" name="numerocuenta"></p>
-        <p>Nombre de entidad: 
+        <p>Nombre de entidad Destino: 
             <select name="ban" id="ban">
                 <option value="">Seleccione...</option>
                 {% for banco in all_bancos %}
@@ -30,10 +30,9 @@
                 {% endfor %}
             </select>
         </p>
+        <p>Numero de Cuenta Destino: <input type="number" name="numerocuenta"></p>
         <p>Monto: <input type="number" name="monto"></p>
         <p><input type="submit" value="Realizar"></p>
-
-
     </form>
 </body>
 </html>

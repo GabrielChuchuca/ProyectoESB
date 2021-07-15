@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Incicio</title>
+    <title>Document</title>
 </head>
 <body>
     <li><a href="/sesion/">Interbancaria</a></li>
@@ -20,21 +20,17 @@
         <p>Numero de cuenta. {{cuenta.num_cuenta}}</p>
         <p>Monto: {{cuenta.monto}}</p>
 
-    <h2>TRANSACCIONES</h2>
-    
-        <table border="1">
-            <tr>
-                <th>Tipo de Transaccion</th>
-                <th>Fecha de Transaccion</th>
-            </tr>
-            {% for tra in transferencia %}
-            <tr>
-                <td>{{tra.tipo_trans}}</td>
-                <td>{{tra.fecha_trans}}</td>
-            </tr>
-            {% endfor %}
-        </table>
-    
-
+    <h2>DEPOSITO/RETIRO</h2>
+    <form action="/obtdatos_d_r/" method="POST">{% csrf_token %}
+        <p>Tipo: 
+        <select name="dep_ret">
+            <option value="">Seleccione...</option>
+            <option value="Deposito">Deposito</option>
+            <option value="Retiro">Retiro</option>
+        </select>
+        </p>
+        <p>Monto: <input type="number" name="monto"></p>
+        <input type="submit" value="Realizar">
+    </form>
 </body>
 </html>

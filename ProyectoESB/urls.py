@@ -26,7 +26,7 @@ urlpatterns = [
     path('sesion_b/', views.obt_sesion_b),
     path('obtdatos_b/', views.obt_datos_trans_banca),
     path('banca/<int:n_cuenta_o>/<str:nom_banco_o>/<int:n_cuenta_d>/<int:mon>/', views.transferencia_bancaria),
-
-
-
+    path('sesion_d_r/', views.obt_sesion_d_r),
+    path('obtdatos_d_r/', views.obt_datos_dep_ret),
+    path('dep_ret/<int:n_cuenta_o>/<str:nom_banco_o>/<str:tipo>/<int:mon>/', views.deposito_retiro),
 ]

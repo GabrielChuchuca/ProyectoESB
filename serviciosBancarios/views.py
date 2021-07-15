@@ -17,19 +17,14 @@ def login_page(request):
         print("metodo login si entra")
         username = request.POST['username']
         password = request.POST['password']
-        #ban = request.POST['bancos']
-        #print("USERNAME: {} - PASSWORD: {} ".format(username, password))
         cliente = Cliente.objects.get(username=username, password=password)
-        #print(cliente.id_cuenta.id_Banco.nombre)
         if cliente.id_cuenta.id_Banco.nombre == request.POST['bancos']:
             if cliente:
                 cuenta = Cuenta.objects.get(num_cuenta=cliente.id_cuenta.num_cuenta)
                 banco = Banco.objects.get(nombre=cliente.id_cuenta.id_Banco.nombre)
-                #print("AQUI :", cliente)
+                transferencia = Transferencia.objects.filter(id_cuenta=cliente.id_cuenta)
                 request.session['cliente'] = serializers.serialize('json', [cliente, cuenta, banco])
-                return render(request, "index_cliente.html", {"cliente": cliente, "cuenta": cuenta, "banco": banco})
-        #if cliente:
-        #request.session['cliente'] = serializers.serialize('json', [cliente, ])[0]   
+                return render(request, "index_cliente.html", {"cliente": cliente, "cuenta": cuenta, "banco": banco, "transferencia": transferencia}) 
     print("metodo login no entra")
     return render(request, "login.html", {"bancos": bancos})
 
@@ -39,10 +34,8 @@ def obt_sesion(request):
     if "cliente" in request.session:
         result = (request.session.get("cliente"))
         d = json.loads(result)
-        #print(d[1]["fields"])
     else:
         d = False
-    #print(result)
     ctx = {"cliente": d[0]["fields"], "cuenta": d[1]["fields"], "banco": d[2]["fields"], "all_bancos": bancos}
     return render(request, "interbancaria.html", ctx)
 
@@ -63,53 +56,38 @@ def obt_datos_trans_inter(request):
         else:
             d = False
     ctx = {"cliente": d[0]["fields"], "cuenta": d[1]["fields"], "banco": d[2]["fields"], "all_bancos": bancos}
-
     print("metodo login no entra")
     return render(request, "interbancaria.html", ctx)
         
 
 def transferencia_interbancaria(request, n_cuenta_o, nom_banco_o, n_cuenta_d, nom_banco_d, mon):
-    #print(n_cuenta_o, nom_banco_o, n_cuenta_d, nom_banco_d, mon)
     cli_o = Cliente.objects.get(id_cuenta=n_cuenta_o)
     cli_d = Cliente.objects.get(id_cuenta=n_cuenta_d)
     if mon <= cli_o.id_cuenta.monto:
         restante = cli_o.id_cuenta.monto - mon
         agregacion = cli_d.id_cuenta.monto + mon
         fecha = datetime.datetime.today()
-        #print(restante)
         id = cli_o.id_cuenta
         trans = Transferencia(fecha_trans=fecha.today(), tipo_trans="Interbancaria", id_cuenta=id)
         trans.save()
         cue_o = Cuenta.objects.get(num_cuenta=cli_o.id_cuenta.num_cuenta)
         cue_d = Cuenta.objects.get(num_cuenta=cli_d.id_cuenta.num_cuenta)
-        #print("CUENTAAAAAAAAA", type(cue_o.monto))
         cue_o.monto = restante
         cue_o.save()
         cue_d.monto = agregacion
         cue_d.save()
         trans1 = Transferencia.objects.latest("id")
-        #cli_d.id_cuenta.monto = agregacion
-        #cli_d.id_cuenta.monto.save()
-        #print("si alcanza", type(json.dumps(trans1.id_cuenta)))
-        #data = serializers.serialize('json', trans1.id_cuenta)
-        return JsonResponse({"id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
-        #print("si alcanza", trans1.id)
+        return JsonResponse({"Estado": "Transferencia Interbancaria Exitosa", "id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
     else:
-        print("no alcanza")
-    print("CLIENTE ORIGEEN: {}".format(cli_o.nombres))
-    print("CLIENTE destino: {}".format(cli_d.nombres))
-    return JsonResponse({"mensaje": "TRANSFERENCIA INTERBANCARIA ERRONEA"})
-    
+        return JsonResponse({"Estado": "Excede Monto"})   
 
 def obt_sesion_b(request):
     print(request.session['cliente'])
     if "cliente" in request.session:
         result = (request.session.get("cliente"))
         d = json.loads(result)
-        #print(d[1]["fields"])
     else:
         d = False
-    #print(result)
     ctx = {"cliente": d[0]["fields"], "cuenta": d[1]["fields"], "banco": d[2]["fields"]}
     return render(request, "bancaria.html", ctx)
 
@@ -128,38 +106,86 @@ def obt_datos_trans_banca(request):
         else:
             d = False
     ctx = {"cliente": d[0]["fields"], "cuenta": d[1]["fields"], "banco": d[2]["fields"]}
-
     print("metodo login no entra")
     return render(request, "bancaria.html", ctx)
 
 def transferencia_bancaria(request, n_cuenta_o, nom_banco_o, n_cuenta_d, mon):
     cli_o = Cliente.objects.get(id_cuenta=n_cuenta_o)
     cli_d = Cliente.objects.get(id_cuenta=n_cuenta_d)
-    #print(cli_o.id_cuenta.id_Banco.nombre)
     if cli_o.id_cuenta.id_Banco.nombre == cli_d.id_cuenta.id_Banco.nombre:
         if mon <= cli_o.id_cuenta.monto:
             restante = cli_o.id_cuenta.monto - mon
             agregacion = cli_d.id_cuenta.monto + mon
             fecha = datetime.datetime.today()
-            #print(restante)
             id = cli_o.id_cuenta
             trans = Transferencia(fecha_trans=fecha.today(), tipo_trans="Bancaria", id_cuenta=id)
             trans.save()
             cue_o = Cuenta.objects.get(num_cuenta=cli_o.id_cuenta.num_cuenta)
             cue_d = Cuenta.objects.get(num_cuenta=cli_d.id_cuenta.num_cuenta)
-            #print("CUENTAAAAAAAAA", type(cue_o.monto))
             cue_o.monto = restante
             cue_o.save()
             cue_d.monto = agregacion
             cue_d.save()
             trans1 = Transferencia.objects.latest("id")
-            return JsonResponse({"id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
+            return JsonResponse({"Estado": "Transferencia Bancaria Exitosa", "id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
         else:
             print("no alcanza")
-        print("CLIENTE ORIGEEN: {}".format(cli_o.nombres))
-        print("CLIENTE destino: {}".format(cli_d.nombres))
-        return JsonResponse({"mensaje": "TRANSFERENCIA BANCARIA ERRONEA"})
-    return JsonResponse("no son las msimas entidades")
+            return JsonResponse({"Estado": "Excede Monto"})
+    return JsonResponse({"Estado": "Error No son las mismos bancos"})
 
+def obt_sesion_d_r(request):
+    print(request.session['cliente'])
+    if "cliente" in request.session:
+        result = (request.session.get("cliente"))
+        d = json.loads(result)
+    else:
+        d = False
+    ctx = {"cliente": d[0]["fields"], "cuenta": d[1]["fields"], "banco": d[2]["fields"]}
+    return render(request, "deposito_retiro.html", ctx)
 
+def obt_datos_dep_ret(request):
+    if request.method == "POST":
+        if "cliente" in request.session:
+            result = (request.session.get("cliente"))
+            d = json.loads(result)
+            n_cue_o = d[1]["fields"]["num_cuenta"]
+            nom_ban_o = d[2]["fields"]["nombre"]
+            tipodr = request.POST['dep_ret'] 
+            monto = int(request.POST['monto'])
+            print(type(n_cue_o), type(nom_ban_o), type(tipodr),type(monto))
+            urll = '/dep_ret/{}/{}/{}/{}/'.format(n_cue_o, nom_ban_o.replace(" ", ""), tipodr, monto)
+            return redirect(urll)
+        else:
+            d = False
+    ctx = {"cliente": d[0]["fields"], "cuenta": d[1]["fields"], "banco": d[2]["fields"]}
+    print("metodo login no entra")
+    return render(request, "deposito_retiro.html", ctx)
 
+def deposito_retiro(request, n_cuenta_o, nom_banco_o, tipo, mon):
+    cli_o = Cliente.objects.get(id_cuenta=n_cuenta_o)
+    if tipo == "Deposito":
+        agregacion = cli_o.id_cuenta.monto + mon
+        fecha = datetime.datetime.today()
+        id = cli_o.id_cuenta
+        trans = Transferencia(fecha_trans=fecha.today(), tipo_trans="Deposito", id_cuenta=id)
+        trans.save()
+        cue_o = Cuenta.objects.get(num_cuenta=cli_o.id_cuenta.num_cuenta)
+        cue_o.monto = agregacion
+        cue_o.save()
+        trans1 = Transferencia.objects.latest("id")
+        return JsonResponse({"Estado": "Deposito Exitoso", "id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
+    elif tipo == "Retiro":
+        if mon <= cli_o.id_cuenta.monto:
+            restante = cli_o.id_cuenta.monto - mon
+            fecha = datetime.datetime.today()
+            id = cli_o.id_cuenta
+            trans = Transferencia(fecha_trans=fecha.today(), tipo_trans="Retiro", id_cuenta=id)
+            trans.save()
+            cue_o = Cuenta.objects.get(num_cuenta=cli_o.id_cuenta.num_cuenta)
+            cue_o.monto = restante
+            cue_o.save()
+            trans1 = Transferencia.objects.latest("id")
+            return JsonResponse({"Estado": "Retiro Exitoso","id": trans1.id, "fecha_trans": trans1.fecha_trans, "tipo_trans": trans1.tipo_trans, "cuenta": model_to_dict(trans1.id_cuenta), "cliente": model_to_dict(cli_o)})
+        else:
+            return JsonResponse({"Estado": "Excede Monto"})
+    return JsonResponse({"Estado": "Deposito/Retiro Erroneo"})

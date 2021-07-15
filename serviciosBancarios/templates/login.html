@@ -6,20 +6,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login</title>
 </head>
 <body>
+    <h1>LOGIN</h1>
     <form action="/login_page/" method="POST">{% csrf_token %}
-        <p><input name="username" type="text" placeholder="Correo/ Username"></p>
-        <p><input name="password" type="password" placeholder="Contraseña"></p>
+        <p>Usuario: <input name="username" type="text" placeholder="Correo/ Username"></p>
+        <p>Contraseña: <input name="password" type="password" placeholder="Contraseña"></p>
 
-
-        <select name="bancos" id="bancos">
+        <p>Entidad a seleccionar: <select name="bancos" id="bancos">
             <option value="">Seleccione...</option>
             {% for banco in bancos %}
             <option value="{{banco.nombre}}">{{banco.nombre}}</option>
             {% endfor %}
-        </select>
+        </select></p>
 
         <p><input type="submit" value="Ingresar"></p>
     </form>
