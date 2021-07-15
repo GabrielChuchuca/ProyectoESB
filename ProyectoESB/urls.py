@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from serviciosBancarios import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +31,4 @@ urlpatterns = [
     path('sesion_d_r/', views.obt_sesion_d_r),
     path('obtdatos_d_r/', views.obt_datos_dep_ret),
     path('dep_ret/<int:n_cuenta_o>/<str:nom_banco_o>/<str:tipo>/<int:mon>/', views.deposito_retiro),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
