@@ -18,6 +18,8 @@ from django.urls import path
 from serviciosBancarios import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import url
+from serviciosBancarios import soap
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +33,5 @@ urlpatterns = [
     path('sesion_d_r/', views.obt_sesion_d_r),
     path('obtdatos_d_r/', views.obt_datos_dep_ret),
     path('dep_ret/<int:n_cuenta_o>/<str:nom_banco_o>/<str:tipo>/<int:mon>/', views.deposito_retiro),
+    url(r'^soap/', soap.consulta()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
